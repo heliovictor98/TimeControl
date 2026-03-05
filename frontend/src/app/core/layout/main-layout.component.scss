@@ -1,0 +1,67 @@
+.main-layout {
+  display: flex;
+  min-height: 100dvh;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #1a1d23;
+  color: #e4e6eb;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.sidebar-nav {
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  color: #b0b3b8;
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #e4e6eb;
+  }
+
+  &.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+  }
+}
+
+.nav-icon {
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  background: #f5f6f8;
+}

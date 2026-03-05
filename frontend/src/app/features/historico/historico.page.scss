@@ -1,0 +1,185 @@
+.historico-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.header {
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .subtitle {
+    font-size: 0.9375rem;
+    color: #555;
+    margin: 0;
+  }
+}
+
+.calendario-section {
+  margin-bottom: 2.5rem;
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.calendario-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.btn-nav {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #495057;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:hover {
+    background: #e9ecef;
+    color: #1a1a1a;
+  }
+}
+
+.mes-ano {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.dia-semana {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-align: center;
+  padding: 0.25rem 0;
+}
+
+.dia-cell {
+  aspect-ratio: 1;
+  max-width: 2.75rem;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: #1a1a1a;
+  background: #f8f9fa;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:hover:not(.vazio) {
+    background: #e9ecef;
+  }
+
+  &.selected {
+    background: #0d6efd;
+    color: #fff;
+    border-color: #0d6efd;
+  }
+
+  &.vazio {
+    background: transparent;
+    cursor: default;
+  }
+}
+
+.lista-section {
+  h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+  }
+
+  .carregando,
+  .vazio,
+  .instrucao {
+    font-size: 0.9375rem;
+    color: #666;
+    margin: 0;
+  }
+}
+
+.grid-wrapper {
+  overflow-x: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  th,
+  td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+
+  th {
+    font-weight: 600;
+    color: #495057;
+    background: #f8f9fa;
+  }
+
+  tbody tr:hover {
+    background: #f8f9fa;
+  }
+
+  .cell-projeto {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .cell-demanda {
+    color: #495057;
+  }
+
+  .cell-hora,
+  .cell-duracao {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cell-duracao {
+    font-weight: 600;
+    color: #0d6efd;
+  }
+
+  .cell-obs {
+    color: #6c757d;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
