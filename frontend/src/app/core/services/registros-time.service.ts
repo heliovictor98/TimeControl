@@ -34,6 +34,11 @@ export class RegistrosTimeService {
     return this.http.get<RegistroTime[]>(`${API}/por-data/${data}`);
   }
 
+  /** Período em YYYY-MM-DD. Retorna registros do período (time_inicial ASC). */
+  listarPorPeriodo(inicio: string, fim: string) {
+    return this.http.get<RegistroTime[]>(`${API}/por-periodo?inicio=${encodeURIComponent(inicio)}&fim=${encodeURIComponent(fim)}`);
+  }
+
   encerrar(id: number) {
     return this.http.patch<RegistroTime>(`${API}/${id}/encerrar`, {});
   }
@@ -49,5 +54,9 @@ export class RegistrosTimeService {
     }>
   ) {
     return this.http.patch<RegistroTime>(`${API}/${id}`, payload);
+  }
+
+  excluir(id: number) {
+    return this.http.delete<void>(`${API}/${id}`);
   }
 }

@@ -1,0 +1,97 @@
+<div class="relatorios-page">
+  <header class="header">
+    <h1>Relatórios</h1>
+    <p class="subtitle">Visualize lançamentos por dia ou por semana (segunda a sexta) e exporte em PDF.</p>
+  </header>
+
+  <section class="filtros">
+    <div class="tipo-toggle">
+      <button
+        type="button"
+        class="btn-tipo"
+        [class.active]="tipoRelatorio() === 'dia'"
+        (click)="setTipo('dia')"
+      >
+        Por dia
+      </button>
+      <button
+        type="button"
+        class="btn-tipo"
+        [class.active]="tipoRelatorio() === 'semana'"
+        (click)="setTipo('semana')"
+      >
+        Por semana (seg–sex)
+      </button>
+    </div>
+
+    @if (tipoRelatorio() === 'dia') {
+      <div class="campo-dia">
+        <label for="data-dia">Data</label>
+        <input
+          id="data-dia"
+          type="date"
+          [ngModel]="dataDia()"
+          (ngModelChange)="onDataDiaChange($event)"
+        />
+      </div>
+    } @else {
+      <div class="campo-semana">
+        <button type="button" class="btn-nav" (click)="semanaAnterior()">‹</button>
+        <span class="label-semana">{{ labelSemana() }}</span>
+        <button type="button" class="btn-nav" (click)="semanaProxima()">›</button>
+      </div>
+    }
+
+    <div class="acao-pdf">
+      <button
+        type="button"
+        class="btn-pdf"
+        (click)="exportarPdf()"
+        [disabled]="loading() || gridRows().length === 0"
+      >
+        Exportar PDF
+      </button>
+    </div>
+  </section>
+
+  <section class="tabela-section">
+    @if (loading()) {
+      <p class="carregando">Carregando…</p>
+    } @else if (gridRows().length === 0) {
+      <p class="vazio">Nenhum lançamento no período.</p>
+    } @else {
+      <div class="grid-wrapper">
+        <table class="grid">
+          <thead>
+            <tr>
+              @if (tipoRelatorio() === 'semana') {
+                <th>Data</th>
+              }
+              <th>Projeto</th>
+              <th>Demanda</th>
+              <th>Início</th>
+              <th>Fim</th>
+              <th>Duração</th>
+              <th>Observação</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of gridRows(); track row.id) {
+              <tr>
+                @if (tipoRelatorio() === 'semana') {
+                  <td class="cell-data">{{ row.dataStr }}</td>
+                }
+                <td class="cell-projeto">{{ row.projeto }}</td>
+                <td class="cell-demanda">{{ row.demanda }}</td>
+                <td class="cell-hora">{{ row.horaInicio }}</td>
+                <td class="cell-hora">{{ row.horaFim }}</td>
+                <td class="cell-duracao">{{ row.duracao }}</td>
+                <td class="cell-obs">{{ row.observacao || '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>

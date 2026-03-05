@@ -222,4 +222,15 @@ export class TimePage implements OnInit, OnDestroy {
       error: () => this.erro.set('Erro ao encerrar registro.'),
     });
   }
+
+  excluir(id: number) {
+    if (!confirm('Excluir este lançamento? Esta ação não pode ser desfeita.')) return;
+    this.api.excluir(id).subscribe({
+      next: () => {
+        this.carregarAtivos();
+        this.carregarRegistrosDia();
+      },
+      error: () => this.erro.set('Erro ao excluir registro.'),
+    });
+  }
 }

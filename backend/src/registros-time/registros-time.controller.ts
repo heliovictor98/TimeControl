@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { CreateRegistroTimeDto } from './dto/create-registro-time.dto';
 import { UpdateRegistroTimeDto } from './dto/update-registro-time.dto';
 import { RegistrosTimeService } from './registros-time.service';
@@ -22,6 +22,11 @@ export class RegistrosTimeController {
     return this.service.listarPorData(data);
   }
 
+  @Get('por-periodo')
+  listarPorPeriodo(@Query('inicio') inicio: string, @Query('fim') fim: string) {
+    return this.service.listarPorPeriodo(inicio, fim);
+  }
+
   @Get()
   listarRecentes() {
     return this.service.listarRecentes();
@@ -35,5 +40,10 @@ export class RegistrosTimeController {
   @Patch(':id')
   atualizar(@Param('id') id: string, @Body() dto: UpdateRegistroTimeDto) {
     return this.service.atualizar(parseInt(id, 10), dto);
+  }
+
+  @Delete(':id')
+  excluir(@Param('id') id: string) {
+    return this.service.excluir(parseInt(id, 10));
   }
 }

@@ -104,7 +104,12 @@
                   <td class="cell-obs">{{ row.observacao || '—' }}</td>
                   <td class="cell-acoes">
                     @if (row.time_final) {
-                      <button type="button" class="btn-editar" (click)="abrirEdicao(row)">Editar</button>
+                      <button type="button" class="btn-icon mat-icon-btn" (click)="abrirEdicao(row)" title="Editar" aria-label="Editar">
+                        <span class="material-icons">edit</span>
+                      </button>
+                      <button type="button" class="btn-icon mat-icon-btn btn-excluir" (click)="excluir(row.id)" title="Excluir" aria-label="Excluir">
+                        <span class="material-icons">delete</span>
+                      </button>
                     } @else {
                       <span class="em-andamento">Em andamento</span>
                     }

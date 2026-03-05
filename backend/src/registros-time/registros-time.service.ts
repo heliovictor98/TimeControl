@@ -51,6 +51,20 @@ export class RegistrosTimeService {
     });
   }
 
+  /** Lista registros de um período (início e fim em YYYY-MM-DD), do menor para o maior (time_inicial ASC). */
+  async listarPorPeriodo(inicioStr: string, fimStr: string): Promise<RegistroTime[]> {
+    const [yi, mi, di] = inicioStr.split('-').map(Number);
+    const [yf, mf, df] = fimStr.split('-').map(Number);
+    const inicio = new Date(yi, mi - 1, di, 0, 0, 0, 0);
+    const fim = new Date(yf, mf - 1, df, 23, 59, 59, 999);
+    return this.repo.find({
+      where: {
+        time_inicial: Between(inicio, fim),
+      },
+      order: { time_inicial: 'ASC' },
+    });
+  }
+
   async encerrar(id: number): Promise<RegistroTime> {
     const registro = await this.repo.findOne({ where: { id } });
     if (!registro) {
@@ -74,5 +88,12 @@ export class RegistrosTimeService {
     if (dto.time_inicial !== undefined) registro.time_inicial = new Date(dto.time_inicial);
     if (dto.time_final !== undefined) registro.time_final = dto.time_final == null ? null : new Date(dto.time_final);
     return this.repo.save(registro);
+  }
+
+  async excluir(id: number): Promise<void> {
+    const resultado = await this.repo.delete(id);
+    if (resultado.affected === 0) {
+      throw new NotFoundException(`Registro ${id} não encontrado`);
+    }
   }
 }

@@ -187,4 +187,15 @@ export class HistoricoPage {
   atualizarEditando(key: 'projeto' | 'demanda' | 'observacao' | 'time_inicial' | 'time_final', value: string) {
     this.editando.update((prev) => (prev ? { ...prev, [key]: value } : prev));
   }
+
+  excluir(id: number) {
+    if (!confirm('Excluir este lançamento? Esta ação não pode ser desfeita.')) return;
+    const dia = this.diaSelecionado();
+    this.api.excluir(id).subscribe({
+      next: () => {
+        if (dia) this.carregarRegistros(dia);
+      },
+      error: () => this.erro.set('Erro ao excluir registro.'),
+    });
+  }
 }
