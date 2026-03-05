@@ -35,6 +35,43 @@
     </div>
   </section>
 
+  @if (editando(); as e) {
+    <section class="edicao-section">
+      <h2>Editar registro</h2>
+      <div class="edicao-form">
+        <div class="field">
+          <label>Projeto</label>
+          <input type="text" [ngModel]="e.projeto" (ngModelChange)="atualizarEditando('projeto', $event)" />
+        </div>
+        <div class="field">
+          <label>Demanda</label>
+          <input type="text" [ngModel]="e.demanda" (ngModelChange)="atualizarEditando('demanda', $event)" />
+        </div>
+        <div class="field">
+          <label>Início</label>
+          <input type="datetime-local" [ngModel]="e.time_inicial" (ngModelChange)="atualizarEditando('time_inicial', $event)" />
+        </div>
+        <div class="field">
+          <label>Fim</label>
+          <input type="datetime-local" [ngModel]="e.time_final" (ngModelChange)="atualizarEditando('time_final', $event)" />
+        </div>
+        <div class="field">
+          <label>Observação</label>
+          <textarea [ngModel]="e.observacao" (ngModelChange)="atualizarEditando('observacao', $event)" rows="2"></textarea>
+        </div>
+        @if (erro()) {
+          <p class="erro">{{ erro() }}</p>
+        }
+        <div class="edicao-buttons">
+          <button type="button" class="btn-cancelar" (click)="cancelarEdicao()" [disabled]="salvando()">Cancelar</button>
+          <button type="button" class="btn-salvar" (click)="salvarEdicao()" [disabled]="salvando()">
+            {{ salvando() ? 'Salvando…' : 'Salvar' }}
+          </button>
+        </div>
+      </div>
+    </section>
+  }
+
   <section class="lista-section">
     @if (diaSelecionado()) {
       <h2>Lançamentos do dia {{ diaSelecionado() }}</h2>
@@ -53,6 +90,7 @@
                 <th>Fim</th>
                 <th>Duração</th>
                 <th>Observação</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -64,6 +102,13 @@
                   <td class="cell-hora">{{ row.horaFim }}</td>
                   <td class="cell-duracao">{{ row.duracao }}</td>
                   <td class="cell-obs">{{ row.observacao || '—' }}</td>
+                  <td class="cell-acoes">
+                    @if (row.time_final) {
+                      <button type="button" class="btn-editar" (click)="abrirEdicao(row)">Editar</button>
+                    } @else {
+                      <span class="em-andamento">Em andamento</span>
+                    }
+                  </td>
                 </tr>
               }
             </tbody>

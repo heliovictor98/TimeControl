@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, IsNull, Repository } from 'typeorm';
 import { CreateRegistroTimeDto } from './dto/create-registro-time.dto';
+import { UpdateRegistroTimeDto } from './dto/update-registro-time.dto';
 import { RegistroTime } from './registro-time.entity';
 
 @Injectable()
@@ -59,6 +60,19 @@ export class RegistrosTimeService {
       return registro;
     }
     registro.time_final = new Date();
+    return this.repo.save(registro);
+  }
+
+  async atualizar(id: number, dto: UpdateRegistroTimeDto): Promise<RegistroTime> {
+    const registro = await this.repo.findOne({ where: { id } });
+    if (!registro) {
+      throw new NotFoundException(`Registro ${id} não encontrado`);
+    }
+    if (dto.projeto !== undefined) registro.projeto = dto.projeto;
+    if (dto.demanda !== undefined) registro.demanda = dto.demanda;
+    if (dto.observacao !== undefined) registro.observacao = dto.observacao;
+    if (dto.time_inicial !== undefined) registro.time_inicial = new Date(dto.time_inicial);
+    if (dto.time_final !== undefined) registro.time_final = dto.time_final == null ? null : new Date(dto.time_final);
     return this.repo.save(registro);
   }
 }

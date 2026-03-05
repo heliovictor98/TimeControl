@@ -88,6 +88,167 @@
   }
 }
 
+.rodando-section {
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 0.75rem 0;
+  }
+}
+
+.rodando-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #f0f7ff;
+  border: 1px solid #b6d4fe;
+  border-radius: 8px;
+
+  .rodando-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1rem;
+    min-width: 0;
+
+    .projeto {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .demanda {
+      color: #495057;
+    }
+
+    .observacao {
+      font-size: 0.875rem;
+      color: #6c757d;
+      width: 100%;
+    }
+
+    .tempo {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      font-size: 1.125rem;
+      color: #0d6efd;
+    }
+  }
+
+  .btn-encerrar {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+    background: #198754;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &:hover {
+      background: #157347;
+    }
+  }
+}
+
+.edicao-section {
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+
+  h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+  }
+}
+
+.edicao-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 480px;
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #333;
+    }
+
+    input,
+    textarea {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+  }
+
+  .erro {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #c00;
+  }
+
+  .edicao-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .btn-cancelar {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: #495057;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: #f8f9fa;
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-salvar {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+    background: #0d6efd;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: #0b5ed7;
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+}
+
 .grid-section {
   h2 {
     font-size: 1.125rem;
@@ -132,10 +293,6 @@
     background: #f8f9fa;
   }
 
-  .row-ativo {
-    background: #f0f7ff;
-  }
-
   .cell-projeto {
     font-weight: 600;
     color: #1a1a1a;
@@ -167,23 +324,18 @@
     white-space: nowrap;
   }
 
-  .btn-encerrar {
+  .btn-editar {
     padding: 0.35rem 0.75rem;
     font-size: 0.8125rem;
     font-weight: 500;
-    color: #fff;
-    background: #198754;
-    border: none;
+    color: #0d6efd;
+    background: #fff;
+    border: 1px solid #0d6efd;
     border-radius: 6px;
     cursor: pointer;
 
     &:hover {
-      background: #157347;
+      background: #e7f1ff;
     }
-  }
-
-  .encerrado {
-    font-size: 0.8125rem;
-    color: #6c757d;
   }
 }

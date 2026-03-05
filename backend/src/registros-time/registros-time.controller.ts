@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { CreateRegistroTimeDto } from './dto/create-registro-time.dto';
+import { UpdateRegistroTimeDto } from './dto/update-registro-time.dto';
 import { RegistrosTimeService } from './registros-time.service';
 
 @Controller('registros-time')
@@ -29,5 +30,10 @@ export class RegistrosTimeController {
   @Patch(':id/encerrar')
   encerrar(@Param('id') id: string) {
     return this.service.encerrar(parseInt(id, 10));
+  }
+
+  @Patch(':id')
+  atualizar(@Param('id') id: string, @Body() dto: UpdateRegistroTimeDto) {
+    return this.service.atualizar(parseInt(id, 10), dto);
   }
 }

@@ -1,11 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RegistrosTimeService, RegistroTime } from '../../core/services/registros-time.service';
 
 @Component({
   selector: 'app-historico-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './historico.page.html',
   styleUrl: './historico.page.scss',
 })
@@ -22,6 +23,19 @@ export class HistoricoPage {
   registrosDia = signal<RegistroTime[]>([]);
 
   loading = signal(false);
+  erro = signal<string | null>(null);
+
+  /** Registro em edição (só para registros encerrados). */
+  editando = signal<{
+    id: number;
+    projeto: string;
+    demanda: string;
+    observacao: string;
+    time_inicial: string;
+    time_final: string;
+  } | null>(null);
+
+  salvando = signal(false);
 
   /** Dias do mês para o grid do calendário: array de { dia: number | null, data: string | null } */
   diasCalendario = computed(() => {
@@ -87,7 +101,7 @@ export class HistoricoPage {
     this.carregarRegistros(data);
   }
 
-  private carregarRegistros(data: string) {
+  carregarRegistros(data: string) {
     this.loading.set(true);
     this.api.listarPorData(data).subscribe({
       next: (lista) => {
@@ -114,5 +128,63 @@ export class HistoricoPage {
       minute: '2-digit',
       second: '2-digit',
     });
+  }
+
+  toDateTimeLocal(iso: string): string {
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  abrirEdicao(row: { id: number; projeto: string; demanda: string; observacao: string | null; time_inicial: string; time_final: string | null }) {
+    if (!row.time_final) return;
+    this.editando.set({
+      id: row.id,
+      projeto: row.projeto,
+      demanda: row.demanda,
+      observacao: row.observacao ?? '',
+      time_inicial: this.toDateTimeLocal(row.time_inicial),
+      time_final: this.toDateTimeLocal(row.time_final),
+    });
+    this.erro.set(null);
+  }
+
+  cancelarEdicao() {
+    this.editando.set(null);
+  }
+
+  salvarEdicao() {
+    const e = this.editando();
+    if (!e) return;
+    if (!e.projeto.trim() || !e.demanda.trim()) {
+      this.erro.set('Preencha projeto e demanda.');
+      return;
+    }
+    this.erro.set(null);
+    this.salvando.set(true);
+    const dia = this.diaSelecionado();
+    this.api
+      .atualizar(e.id, {
+        projeto: e.projeto.trim(),
+        demanda: e.demanda.trim(),
+        observacao: e.observacao.trim() || null,
+        time_inicial: new Date(e.time_inicial).toISOString(),
+        time_final: new Date(e.time_final).toISOString(),
+      })
+      .subscribe({
+        next: () => {
+          this.editando.set(null);
+          if (dia) this.carregarRegistros(dia);
+          this.salvando.set(false);
+        },
+        error: () => {
+          this.erro.set('Erro ao salvar.');
+          this.salvando.set(false);
+        },
+      });
+  }
+
+  atualizarEditando(key: 'projeto' | 'demanda' | 'observacao' | 'time_inicial' | 'time_final', value: string) {
+    this.editando.update((prev) => (prev ? { ...prev, [key]: value } : prev));
   }
 }

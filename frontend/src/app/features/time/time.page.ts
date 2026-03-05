@@ -31,6 +31,18 @@ export class TimePage implements OnInit, OnDestroy {
   loading = signal(false);
   erro = signal<string | null>(null);
 
+  /** Registro em edição (dados do formulário; time_* em formato datetime-local). */
+  editando = signal<{
+    id: number;
+    projeto: string;
+    demanda: string;
+    observacao: string;
+    time_inicial: string;
+    time_final: string;
+  } | null>(null);
+
+  salvando = signal(false);
+
   private tick = signal(0);
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -97,6 +109,64 @@ export class TimePage implements OnInit, OnDestroy {
       minute: '2-digit',
       second: '2-digit',
     });
+  }
+
+  /** Converte ISO para valor de input datetime-local (yyyy-MM-ddThh:mm). */
+  toDateTimeLocal(iso: string): string {
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  abrirEdicao(row: { id: number; projeto: string; demanda: string; observacao: string | null; time_inicial: string; time_final: string | null }) {
+    if (!row.time_final) return;
+    this.editando.set({
+      id: row.id,
+      projeto: row.projeto,
+      demanda: row.demanda,
+      observacao: row.observacao ?? '',
+      time_inicial: this.toDateTimeLocal(row.time_inicial),
+      time_final: this.toDateTimeLocal(row.time_final),
+    });
+    this.erro.set(null);
+  }
+
+  cancelarEdicao() {
+    this.editando.set(null);
+  }
+
+  salvarEdicao() {
+    const e = this.editando();
+    if (!e) return;
+    if (!e.projeto.trim() || !e.demanda.trim()) {
+      this.erro.set('Preencha projeto e demanda.');
+      return;
+    }
+    this.erro.set(null);
+    this.salvando.set(true);
+    this.api
+      .atualizar(e.id, {
+        projeto: e.projeto.trim(),
+        demanda: e.demanda.trim(),
+        observacao: e.observacao.trim() || null,
+        time_inicial: new Date(e.time_inicial).toISOString(),
+        time_final: new Date(e.time_final).toISOString(),
+      })
+      .subscribe({
+        next: () => {
+          this.editando.set(null);
+          this.carregarRegistrosDia();
+          this.salvando.set(false);
+        },
+        error: () => {
+          this.erro.set('Erro ao salvar.');
+          this.salvando.set(false);
+        },
+      });
+  }
+
+  atualizarEditando(key: 'projeto' | 'demanda' | 'observacao' | 'time_inicial' | 'time_final', value: string) {
+    this.editando.update((prev) => (prev ? { ...prev, [key]: value } : prev));
   }
 
   private carregarAtivos() {

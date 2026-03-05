@@ -15,6 +15,7 @@
           (ngModelChange)="projeto.set($event)"
           name="projeto"
           placeholder="Ex: Portal do Cliente"
+          [disabled]="!!rodando()"
         />
       </div>
       <div class="field">
@@ -26,6 +27,7 @@
           (ngModelChange)="demanda.set($event)"
           name="demanda"
           placeholder="Ex: Tarefa 123"
+          [disabled]="!!rodando()"
         />
       </div>
       <div class="field">
@@ -37,21 +39,78 @@
           name="observacao"
           placeholder="Opcional"
           rows="2"
+          [disabled]="!!rodando()"
         ></textarea>
       </div>
       @if (erro()) {
         <p class="erro">{{ erro() }}</p>
       }
-      <button type="submit" class="btn-play" [disabled]="loading()">
+      <button type="submit" class="btn-play" [disabled]="loading() || !!rodando()">
         {{ loading() ? 'Iniciando…' : '▶ Play' }}
       </button>
     </form>
   </section>
 
+  @if (rodando(); as r) {
+    <section class="rodando-section">
+      <h2>Em andamento</h2>
+      <div class="rodando-card">
+        <div class="rodando-info">
+          <span class="projeto">{{ r.projeto }}</span>
+          <span class="demanda">{{ r.demanda }}</span>
+          @if (r.observacao) {
+            <span class="observacao">{{ r.observacao }}</span>
+          }
+          <span class="tempo">{{ r.duracao }}</span>
+        </div>
+        <button type="button" class="btn-encerrar" (click)="encerrar(r.id)">
+          Encerrar
+        </button>
+      </div>
+    </section>
+  }
+
+  @if (editando(); as e) {
+    <section class="edicao-section">
+      <h2>Editar registro</h2>
+      <div class="edicao-form">
+        <div class="field">
+          <label>Projeto</label>
+          <input type="text" [ngModel]="e.projeto" (ngModelChange)="atualizarEditando('projeto', $event)" />
+        </div>
+        <div class="field">
+          <label>Demanda</label>
+          <input type="text" [ngModel]="e.demanda" (ngModelChange)="atualizarEditando('demanda', $event)" />
+        </div>
+        <div class="field">
+          <label>Início</label>
+          <input type="datetime-local" [ngModel]="e.time_inicial" (ngModelChange)="atualizarEditando('time_inicial', $event)" />
+        </div>
+        <div class="field">
+          <label>Fim</label>
+          <input type="datetime-local" [ngModel]="e.time_final" (ngModelChange)="atualizarEditando('time_final', $event)" />
+        </div>
+        <div class="field">
+          <label>Observação</label>
+          <textarea [ngModel]="e.observacao" (ngModelChange)="atualizarEditando('observacao', $event)" rows="2"></textarea>
+        </div>
+        @if (erro()) {
+          <p class="erro">{{ erro() }}</p>
+        }
+        <div class="edicao-buttons">
+          <button type="button" class="btn-cancelar" (click)="cancelarEdicao()" [disabled]="salvando()">Cancelar</button>
+          <button type="button" class="btn-salvar" (click)="salvarEdicao()" [disabled]="salvando()">
+            {{ salvando() ? 'Salvando…' : 'Salvar' }}
+          </button>
+        </div>
+      </div>
+    </section>
+  }
+
   <section class="grid-section">
     <h2>Registros do dia ({{ hoje() }})</h2>
     @if (gridRows().length === 0) {
-      <p class="vazio">Nenhum registro hoje. Use o formulário acima e clique em Play.</p>
+      <p class="vazio">Nenhum registro encerrado hoje.</p>
     } @else {
       <div class="grid-wrapper">
         <table class="grid">
@@ -68,7 +127,7 @@
           </thead>
           <tbody>
             @for (row of gridRows(); track row.id) {
-              <tr [class.row-ativo]="row.ativo">
+              <tr>
                 <td class="cell-projeto">{{ row.projeto }}</td>
                 <td class="cell-demanda">{{ row.demanda }}</td>
                 <td class="cell-hora">{{ row.horaInicio }}</td>
@@ -76,13 +135,7 @@
                 <td class="cell-duracao">{{ row.duracao }}</td>
                 <td class="cell-obs">{{ row.observacao || '—' }}</td>
                 <td class="cell-acoes">
-                  @if (row.ativo) {
-                    <button type="button" class="btn-encerrar" (click)="encerrar(row.id)">
-                      Encerrar
-                    </button>
-                  } @else {
-                    <span class="encerrado">Encerrado</span>
-                  }
+                  <button type="button" class="btn-editar" (click)="abrirEdicao(row)">Editar</button>
                 </td>
               </tr>
             }

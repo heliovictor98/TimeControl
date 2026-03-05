@@ -37,4 +37,17 @@ export class RegistrosTimeService {
   encerrar(id: number) {
     return this.http.patch<RegistroTime>(`${API}/${id}/encerrar`, {});
   }
+
+  atualizar(
+    id: number,
+    payload: Partial<{
+      projeto: string;
+      demanda: string;
+      observacao: string | null;
+      time_inicial: string;
+      time_final: string | null;
+    }>
+  ) {
+    return this.http.patch<RegistroTime>(`${API}/${id}`, payload);
+  }
 }
