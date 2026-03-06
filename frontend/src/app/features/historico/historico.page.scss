@@ -143,11 +143,15 @@
     }
 
     input,
-    textarea {
+    textarea,
+    .select {
       padding: 0.5rem 0.75rem;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 1rem;
+    }
+    .select {
+      min-width: 200px;
     }
   }
 

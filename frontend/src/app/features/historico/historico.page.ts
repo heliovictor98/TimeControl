@@ -1,7 +1,9 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RegistrosTimeService, RegistroTime } from '../../core/services/registros-time.service';
+import { ProjetosService, Projeto } from '../../core/services/projetos.service';
+import { DemandasService, Demanda } from '../../core/services/demandas.service';
 
 @Component({
   selector: 'app-historico-page',
@@ -10,8 +12,13 @@ import { RegistrosTimeService, RegistroTime } from '../../core/services/registro
   templateUrl: './historico.page.html',
   styleUrl: './historico.page.scss',
 })
-export class HistoricoPage {
+export class HistoricoPage implements OnInit {
   private readonly api = inject(RegistrosTimeService);
+  private readonly projetosApi = inject(ProjetosService);
+  private readonly demandasApi = inject(DemandasService);
+
+  projetos = signal<Projeto[]>([]);
+  demandas = signal<Demanda[]>([]);
 
   /** Mês/ano do calendário exibido */
   mesAno = signal({ ano: new Date().getFullYear(), mes: new Date().getMonth() });
@@ -28,8 +35,8 @@ export class HistoricoPage {
   /** Registro em edição (só para registros encerrados). */
   editando = signal<{
     id: number;
-    projeto: string;
-    demanda: string;
+    projeto_id: number | null;
+    demanda_id: number | null;
     observacao: string;
     time_inicial: string;
     time_final: string;
@@ -95,6 +102,11 @@ export class HistoricoPage {
     }
   }
 
+  ngOnInit() {
+    this.projetosApi.listar().subscribe({ next: (p) => this.projetos.set(p) });
+    this.demandasApi.listar().subscribe({ next: (d) => this.demandas.set(d) });
+  }
+
   selecionarDia(data: string | null) {
     if (!data) return;
     this.diaSelecionado.set(data);
@@ -136,12 +148,12 @@ export class HistoricoPage {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
-  abrirEdicao(row: { id: number; projeto: string; demanda: string; observacao: string | null; time_inicial: string; time_final: string | null }) {
+  abrirEdicao(row: { id: number; projetoId: number | null; demandaId: number | null; observacao: string | null; time_inicial: string; time_final: string | null }) {
     if (!row.time_final) return;
     this.editando.set({
       id: row.id,
-      projeto: row.projeto,
-      demanda: row.demanda,
+      projeto_id: row.projetoId ?? null,
+      demanda_id: row.demandaId ?? null,
       observacao: row.observacao ?? '',
       time_inicial: this.toDateTimeLocal(row.time_inicial),
       time_final: this.toDateTimeLocal(row.time_final),
@@ -156,17 +168,13 @@ export class HistoricoPage {
   salvarEdicao() {
     const e = this.editando();
     if (!e) return;
-    if (!e.projeto.trim() || !e.demanda.trim()) {
-      this.erro.set('Preencha projeto e demanda.');
-      return;
-    }
     this.erro.set(null);
     this.salvando.set(true);
     const dia = this.diaSelecionado();
     this.api
       .atualizar(e.id, {
-        projeto: e.projeto.trim(),
-        demanda: e.demanda.trim(),
+        projeto_id: e.projeto_id,
+        demanda_id: e.demanda_id,
         observacao: e.observacao.trim() || null,
         time_inicial: new Date(e.time_inicial).toISOString(),
         time_final: new Date(e.time_final).toISOString(),
@@ -184,7 +192,10 @@ export class HistoricoPage {
       });
   }
 
-  atualizarEditando(key: 'projeto' | 'demanda' | 'observacao' | 'time_inicial' | 'time_final', value: string) {
+  atualizarEditando(
+    key: 'projeto_id' | 'demanda_id' | 'observacao' | 'time_inicial' | 'time_final',
+    value: number | null | string
+  ) {
     this.editando.update((prev) => (prev ? { ...prev, [key]: value } : prev));
   }
 

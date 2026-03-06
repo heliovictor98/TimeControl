@@ -12,6 +12,8 @@ import {
   RegistrosTimeService,
   RegistroTime,
 } from '../../core/services/registros-time.service';
+import { ProjetosService, Projeto } from '../../core/services/projetos.service';
+import { DemandasService, Demanda } from '../../core/services/demandas.service';
 
 @Component({
   selector: 'app-time-page',
@@ -22,20 +24,24 @@ import {
 })
 export class TimePage implements OnInit, OnDestroy {
   private readonly api = inject(RegistrosTimeService);
+  private readonly projetosApi = inject(ProjetosService);
+  private readonly demandasApi = inject(DemandasService);
 
-  projeto = signal('');
-  demanda = signal('');
+  projetoId = signal<number | null>(null);
+  demandaId = signal<number | null>(null);
   observacao = signal('');
+  projetos = signal<Projeto[]>([]);
+  demandas = signal<Demanda[]>([]);
   ativos = signal<RegistroTime[]>([]);
   registrosDia = signal<RegistroTime[]>([]);
   loading = signal(false);
   erro = signal<string | null>(null);
 
-  /** Registro em edição (dados do formulário; time_* em formato datetime-local). */
+  /** Registro em edição (projeto_id/demanda_id podem ser null = Projeto Livre / Demanda zero). */
   editando = signal<{
     id: number;
-    projeto: string;
-    demanda: string;
+    projeto_id: number | null;
+    demanda_id: number | null;
     observacao: string;
     time_inicial: string;
     time_final: string;
@@ -43,10 +49,17 @@ export class TimePage implements OnInit, OnDestroy {
 
   salvando = signal(false);
 
+  /** Demandas filtradas pelo projeto selecionado (ou todas se nenhum projeto). */
+  demandasFiltradas = computed(() => {
+    const pid = this.projetoId();
+    const list = this.demandas();
+    if (pid == null) return list;
+    return list.filter((d) => d.projeto?.id === pid);
+  });
+
   private tick = signal(0);
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
-  /** Data de hoje em YYYY-MM-DD para carregar registros do dia. */
   hoje = computed(() => {
     const d = new Date();
     return [
@@ -56,7 +69,6 @@ export class TimePage implements OnInit, OnDestroy {
     ].join('-');
   });
 
-  /** Registro em andamento (no máximo um). Fica fora do grid, abaixo do Play. */
   rodando = computed(() => {
     this.tick();
     const lista = this.ativos();
@@ -68,7 +80,6 @@ export class TimePage implements OnInit, OnDestroy {
     return { ...r, duracao, horaInicio: this.formatarHora(r.time_inicial) };
   });
 
-  /** Grid: só registros do dia já encerrados (do menor para o maior). */
   gridRows = computed(() => {
     const lista = this.registrosDia().filter((r) => r.time_final != null);
     return lista.map((r) => {
@@ -84,6 +95,7 @@ export class TimePage implements OnInit, OnDestroy {
   });
 
   ngOnInit() {
+    this.carregarProjetosDemandas();
     this.carregarAtivos();
     this.carregarRegistrosDia();
     this.intervalId = setInterval(() => this.tick.update((n) => n + 1), 1000);
@@ -111,19 +123,30 @@ export class TimePage implements OnInit, OnDestroy {
     });
   }
 
-  /** Converte ISO para valor de input datetime-local (yyyy-MM-ddThh:mm). */
   toDateTimeLocal(iso: string): string {
     const d = new Date(iso);
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
-  abrirEdicao(row: { id: number; projeto: string; demanda: string; observacao: string | null; time_inicial: string; time_final: string | null }) {
+  private carregarProjetosDemandas() {
+    this.projetosApi.listar().subscribe({ next: (p) => this.projetos.set(p) });
+    this.demandasApi.listar().subscribe({ next: (d) => this.demandas.set(d) });
+  }
+
+  abrirEdicao(row: {
+    id: number;
+    projetoId: number | null;
+    demandaId: number | null;
+    observacao: string | null;
+    time_inicial: string;
+    time_final: string | null;
+  }) {
     if (!row.time_final) return;
     this.editando.set({
       id: row.id,
-      projeto: row.projeto,
-      demanda: row.demanda,
+      projeto_id: row.projetoId ?? null,
+      demanda_id: row.demandaId ?? null,
       observacao: row.observacao ?? '',
       time_inicial: this.toDateTimeLocal(row.time_inicial),
       time_final: this.toDateTimeLocal(row.time_final),
@@ -138,16 +161,12 @@ export class TimePage implements OnInit, OnDestroy {
   salvarEdicao() {
     const e = this.editando();
     if (!e) return;
-    if (!e.projeto.trim() || !e.demanda.trim()) {
-      this.erro.set('Preencha projeto e demanda.');
-      return;
-    }
     this.erro.set(null);
     this.salvando.set(true);
     this.api
       .atualizar(e.id, {
-        projeto: e.projeto.trim(),
-        demanda: e.demanda.trim(),
+        projeto_id: e.projeto_id,
+        demanda_id: e.demanda_id,
         observacao: e.observacao.trim() || null,
         time_inicial: new Date(e.time_inicial).toISOString(),
         time_final: new Date(e.time_final).toISOString(),
@@ -165,7 +184,10 @@ export class TimePage implements OnInit, OnDestroy {
       });
   }
 
-  atualizarEditando(key: 'projeto' | 'demanda' | 'observacao' | 'time_inicial' | 'time_final', value: string) {
+  atualizarEditando(
+    key: 'projeto_id' | 'demanda_id' | 'observacao' | 'time_inicial' | 'time_final',
+    value: number | null | string
+  ) {
     this.editando.update((prev) => (prev ? { ...prev, [key]: value } : prev));
   }
 
@@ -185,32 +207,28 @@ export class TimePage implements OnInit, OnDestroy {
   }
 
   play() {
-    const p = this.projeto().trim();
-    const d = this.demanda().trim();
-    if (!p || !d) {
-      this.erro.set('Preencha projeto e demanda.');
-      return;
-    }
     if (this.ativos().length > 0) {
       this.erro.set('Encerre o registro em andamento antes de iniciar outro.');
       return;
     }
     this.erro.set(null);
     this.loading.set(true);
-    this.api.iniciar(p, d, this.observacao().trim() || undefined).subscribe({
-      next: () => {
-        this.carregarAtivos();
-        this.carregarRegistrosDia();
-        this.projeto.set('');
-        this.demanda.set('');
-        this.observacao.set('');
-        this.loading.set(false);
-      },
-      error: () => {
-        this.erro.set('Erro ao iniciar registro.');
-        this.loading.set(false);
-      },
-    });
+    this.api
+      .iniciar(this.projetoId(), this.demandaId(), this.observacao().trim() || undefined)
+      .subscribe({
+        next: () => {
+          this.carregarAtivos();
+          this.carregarRegistrosDia();
+          this.projetoId.set(null);
+          this.demandaId.set(null);
+          this.observacao.set('');
+          this.loading.set(false);
+        },
+        error: () => {
+          this.erro.set('Erro ao iniciar registro.');
+          this.loading.set(false);
+        },
+      });
   }
 
   encerrar(id: number) {

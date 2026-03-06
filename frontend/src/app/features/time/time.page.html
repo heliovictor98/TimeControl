@@ -8,27 +8,35 @@
     <form (ngSubmit)="play()" class="form">
       <div class="field">
         <label for="projeto">Projeto</label>
-        <input
+        <select
           id="projeto"
-          type="text"
-          [ngModel]="projeto()"
-          (ngModelChange)="projeto.set($event)"
+          [ngModel]="projetoId()"
+          (ngModelChange)="projetoId.set($event); demandaId.set(null)"
           name="projeto"
-          placeholder="Ex: Portal do Cliente"
           [disabled]="!!rodando()"
-        />
+          class="select"
+        >
+          <option [ngValue]="null">Projeto Livre</option>
+          @for (p of projetos(); track p.id) {
+            <option [ngValue]="p.id">{{ p.nome }}</option>
+          }
+        </select>
       </div>
       <div class="field">
         <label for="demanda">Demanda</label>
-        <input
+        <select
           id="demanda"
-          type="text"
-          [ngModel]="demanda()"
-          (ngModelChange)="demanda.set($event)"
+          [ngModel]="demandaId()"
+          (ngModelChange)="demandaId.set($event)"
           name="demanda"
-          placeholder="Ex: Tarefa 123"
           [disabled]="!!rodando()"
-        />
+          class="select"
+        >
+          <option [ngValue]="null">Demanda zero</option>
+          @for (d of demandasFiltradas(); track d.id) {
+            <option [ngValue]="d.id">{{ d.nome }}</option>
+          }
+        </select>
       </div>
       <div class="field">
         <label for="observacao">Observação</label>
@@ -76,11 +84,21 @@
       <div class="edicao-form">
         <div class="field">
           <label>Projeto</label>
-          <input type="text" [ngModel]="e.projeto" (ngModelChange)="atualizarEditando('projeto', $event)" />
+          <select [ngModel]="e.projeto_id" (ngModelChange)="atualizarEditando('projeto_id', $event)" class="select">
+            <option [ngValue]="null">Projeto Livre</option>
+            @for (p of projetos(); track p.id) {
+              <option [ngValue]="p.id">{{ p.nome }}</option>
+            }
+          </select>
         </div>
         <div class="field">
           <label>Demanda</label>
-          <input type="text" [ngModel]="e.demanda" (ngModelChange)="atualizarEditando('demanda', $event)" />
+          <select [ngModel]="e.demanda_id" (ngModelChange)="atualizarEditando('demanda_id', $event)" class="select">
+            <option [ngValue]="null">Demanda zero</option>
+            @for (d of demandas(); track d.id) {
+              <option [ngValue]="d.id">{{ d.nome }}</option>
+            }
+          </select>
         </div>
         <div class="field">
           <label>Início</label>

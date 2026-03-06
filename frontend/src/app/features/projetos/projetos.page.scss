@@ -1,0 +1,149 @@
+.projetos-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.header {
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .subtitle {
+    font-size: 0.9375rem;
+    color: #555;
+    margin: 0;
+  }
+}
+
+.erro {
+  color: #c00;
+  margin-bottom: 1rem;
+}
+
+.section {
+  margin-bottom: 2.5rem;
+
+  h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 0.75rem 0;
+  }
+
+  .hint {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0 0 0.75rem 0;
+  }
+}
+
+.form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  min-width: 180px;
+}
+
+.select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  min-width: 160px;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+
+  &.btn-primary {
+    background: #0d6efd;
+    color: #fff;
+    &:hover:not(:disabled) {
+      background: #0b5ed7;
+    }
+  }
+
+  &.btn-secondary {
+    background: #e9ecef;
+    color: #495057;
+    &:hover {
+      background: #dee2e6;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+
+  .nome {
+    flex: 1;
+    min-width: 0;
+    font-weight: 500;
+  }
+
+  .projeto-ref {
+    font-size: 0.875rem;
+    color: #6c757d;
+    min-width: 120px;
+  }
+
+  .mat-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    color: #5f6368;
+    .material-icons {
+      font-size: 20px;
+    }
+    &:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: #0d6efd;
+    }
+    &.btn-excluir:hover {
+      background: rgba(220, 53, 69, 0.08);
+      color: #dc3545;
+    }
+  }
+}

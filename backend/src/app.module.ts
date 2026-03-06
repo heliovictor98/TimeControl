@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { DemandasModule } from './demandas/demandas.module';
+import { ProjetosModule } from './projetos/projetos.module';
 import { RegistrosTimeModule } from './registros-time/registros-time.module';
 
 @Module({
@@ -18,6 +20,8 @@ import { RegistrosTimeModule } from './registros-time/registros-time.module';
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
     }),
+    ProjetosModule,
+    DemandasModule,
     RegistrosTimeModule,
   ],
   controllers: [AppController],

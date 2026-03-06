@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 
 export interface RegistroTime {
   id: number;
+  projetoId: number | null;
+  demandaId: number | null;
   projeto: string;
   demanda: string;
   time_inicial: string;
@@ -17,10 +19,10 @@ const API = '/api/registros-time';
 export class RegistrosTimeService {
   constructor(private http: HttpClient) {}
 
-  iniciar(projeto: string, demanda: string, observacao?: string) {
+  iniciar(projetoId: number | null, demandaId: number | null, observacao?: string) {
     return this.http.post<RegistroTime>(API, {
-      projeto,
-      demanda,
+      projeto_id: projetoId,
+      demanda_id: demandaId,
       ...(observacao && { observacao }),
     });
   }
@@ -46,8 +48,8 @@ export class RegistrosTimeService {
   atualizar(
     id: number,
     payload: Partial<{
-      projeto: string;
-      demanda: string;
+      projeto_id: number | null;
+      demanda_id: number | null;
       observacao: string | null;
       time_inicial: string;
       time_final: string | null;

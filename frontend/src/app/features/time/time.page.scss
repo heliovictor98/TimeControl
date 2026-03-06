@@ -58,6 +58,14 @@
       resize: vertical;
       min-height: 60px;
     }
+
+    .select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      min-width: 200px;
+    }
   }
 
   .erro {
@@ -171,7 +179,7 @@
   }
 }
 
-.edicao-form {
+  .edicao-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -189,11 +197,16 @@
     }
 
     input,
-    textarea {
+    textarea,
+    .select {
       padding: 0.5rem 0.75rem;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 1rem;
+    }
+
+    .select {
+      min-width: 200px;
     }
   }
 

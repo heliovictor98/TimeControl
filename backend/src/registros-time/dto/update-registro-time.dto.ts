@@ -1,8 +1,8 @@
 export class UpdateRegistroTimeDto {
-  projeto?: string;
-  demanda?: string;
+  projeto_id?: number | null;
+  demanda_id?: number | null;
   observacao?: string;
-  /** ISO 8601 (ex: 2026-03-05T13:30:00.000Z) */
+  /** ISO 8601 */
   time_inicial?: string;
   /** ISO 8601; null para registro em andamento */
   time_final?: string | null;

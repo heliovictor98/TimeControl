@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -10,7 +8,7 @@ services:
       POSTGRES_PASSWORD: timecontrol_secret
       POSTGRES_DB: timecontrol
     ports:
-      - "5432:5432"
+      - "0.0.0.0:5432:5432"  # escuta em todas as interfaces (rede local)
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -18,6 +16,38 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  backend:
+    build: ./backend
+    container_name: timecontrol-backend
+    restart: unless-stopped
+    ports:
+      # 0.0.0.0 = acessível em toda a rede; 3001 no host para não conflitar com npm start local
+      - "0.0.0.0:3001:3000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: timecontrol
+      DB_PASSWORD: timecontrol_secret
+      DB_NAME: timecontrol
+      FRONTEND_URL: http://localhost:4201
+      # CORS: * = aceitar de qualquer origem (rede local); ou liste origens separadas por vírgula
+      CORS_ORIGINS: "*"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: timecontrol-frontend
+    restart: unless-stopped
+    ports:
+      # 0.0.0.0 = acessível em toda a rede; 4201 no host para não conflitar com ng serve
+      - "0.0.0.0:4201:80"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
